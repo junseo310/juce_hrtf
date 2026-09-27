@@ -1,0 +1,47 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: linux,   os: ubuntu-latest  }
+          - { name: macos,   os: macos-latest   }
+          - { name: windows, os: windows-latest }
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel 4
+
+      - name: Test
+        run: ctest --test-dir build --build-config Release --output-on-failure
+
+      # Proof the thing renders, not just that it compiles. The artifact is a
+      # source orbiting the listener; anyone can download it and listen.
+      - name: Render demo
+        run: |
+          cmake --build build --config Release --target render_offline
+          ./build/render_offline orbit-${{ matrix.name }}.wav || ./build/Release/render_offline.exe orbit-${{ matrix.name }}.wav
+        shell: bash
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbit-${{ matrix.name }}
+          path: orbit-${{ matrix.name }}.wav

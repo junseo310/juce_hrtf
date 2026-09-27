@@ -1,0 +1,6 @@
+[submodule "external/libmysofa"]
+	path = external/libmysofa
+	url = https://github.com/hoene/libmysofa.git
+[submodule "external/JUCE"]
+	path = external/JUCE
+	url = https://github.com/juce-framework/JUCE.git

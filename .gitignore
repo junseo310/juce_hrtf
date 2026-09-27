@@ -1,0 +1,9 @@
+build/
+cmake-build-*/
+.vs/
+.idea/
+.DS_Store
+*.user
+
+# Datasets are fetched, never committed. See scripts/fetch-hrtfs.sh
+hrtfs/*.sofa
